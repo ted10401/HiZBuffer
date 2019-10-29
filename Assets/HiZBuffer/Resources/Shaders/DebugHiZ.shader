@@ -1,8 +1,8 @@
-﻿Shader "Hidden/Viewer"
+﻿Shader "IndirectRendering/HiZ/Debug"
 {
     Properties
     {
-       _MainTex ("Texture", 2D) = "white" {}
+        _MainTex ("Texture", 2D) = "white" {}
     }
 
     CGINCLUDE
@@ -24,7 +24,10 @@
     SamplerState sampler_MainTex;
 
     float4 _MainTex_TexelSize;
+    Texture2D _CameraDepthTexture;
+    SamplerState sampler_CameraDepthTexture;
 
+    int _NUM;
     int _LOD;
 
     Varyings vertex(Input input)
@@ -44,8 +47,8 @@
 
     float4 fragment(in Varyings input) : SV_Target
     {
-        float2 rg = _MainTex.SampleLevel(sampler_MainTex, input.uv, _LOD).rg;
-        return lerp(float4(rg.r, 0., 0., 1.), float4(0., rg.g, 0., 1.), step(.5, input.uv.x));
+        float4 output = _MainTex.SampleLevel(sampler_MainTex, input.uv, _LOD);
+        return lerp(output.r * 100, output.g, _NUM);
     }
     ENDCG
 
